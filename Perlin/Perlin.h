@@ -1,21 +1,26 @@
-#ifndef _PERLIN_H_
-#define _PERLIN_H_
+#ifndef PERLIN_H_
+#define PERLIN_H_
 
 class Perlin
 {
 public:
-	Perlin(int a_iSampleSize = 256, unsigned int a_uiSeed = 0);
+	Perlin(int sample_size = 256, unsigned int seed = 0);
 	~Perlin();
 
+	float Noise(float x);
 	float Noise2(float x, float y);
+	float Noise3(float x, float y, float z);
 
 protected:
 	float Fade(float t);
 	float Lerp(float t, float a, float b);
+	float Grad(int hash, float x);
 	float Grad(int hash, float x, float y);
+	float Grad(int hash, float x, float y, float z);
 
-	int m_iSampleSize;
-	int *m_aiPermutations;
+	int sample_size_;
+	int* permutations_;
 };
 
-#endif // _PERLIN_H_
+#endif // PERLIN_H_
+
