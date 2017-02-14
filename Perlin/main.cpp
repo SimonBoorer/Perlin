@@ -1,24 +1,51 @@
-#include <SDL.h>
+#include <iostream>
 #include <algorithm>
+#include <OpenImageIO/imageio.h>
+OIIO_NAMESPACE_USING
 
 #include "Perlin.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	int sample_size = 256;
+	if (argc < 2)
+	{
+		std::cout << "Usage: perlin outputfile" << std::endl;
+		return 0;
+	}
+
+	char* outputfile = argv[1];
+	ImageOutput* out = ImageOutput::create(outputfile);
+	if (!out)
+	{
+		std::cerr << "Could not create an ImageOutput for "
+			<< outputfile << ", error = "
+			<< OpenImageIO::geterror() << std::endl;
+		return 0;
+	}
+
+	const int xres = 256;
+	const int yres = 256;
+	const int channels = 3; // RGB
+	ImageSpec outspec(xres, yres, channels, TypeDesc::UINT8);
+
+	if (!out->open(outputfile, outspec))
+	{
+		std::cerr << "Could not open " << outputfile
+			<< ", error = " << out->geterror() << std::endl;
+		ImageOutput::destroy(out);
+		return 0;
+	}
+
+	const int sample_size = 256;
 	Perlin perlin(sample_size);
 
-	SDL_Surface *surface  = SDL_CreateRGBSurface(SDL_SWSURFACE, sample_size, sample_size, 32,
-		0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-	SDL_LockSurface(surface);
-
-	float persistence = 0.99;
+	float persistence = 0.5;
 	int octaves = 2;
 
-	unsigned int *pixels = (unsigned int *) surface->pixels;
-	for (int y = 0; y < sample_size; ++y)
+	unsigned char pixels[xres * yres * channels];
+	for (int y = 0; y < yres; y++)
 	{
-		for (int x = 0; x < sample_size; ++x)
+		for (int x = 0; x < xres; x++)
 		{
 			float frequency, amplitude;
 			float total = 0.0f;
@@ -35,13 +62,21 @@ int main()
 			total = std::min<float>(1.0f, std::max<float>(0.0f, total));
 			unsigned int noise = (unsigned int) (total * 255);
 
-			pixels[y * sample_size + x] =
-				SDL_MapRGB(surface->format, noise, noise, noise);
+			pixels[y * xres * channels + x * channels] = noise;
+			pixels[y * xres * channels + x * channels + 1] = noise;
+			pixels[y * xres * channels + x * channels + 2] = noise;
 		}
 	}
 
-	SDL_UnlockSurface(surface);
-	SDL_SaveBMP(surface, "Perlin.bmp");
+	if (!out->write_image(TypeDesc::UINT8, pixels))
+	{
+		std::cerr << "Could not write pixels to " << outputfile
+			<< ", error = " << out->geterror() << std::endl;
+		ImageOutput::destroy(out);
+		return 0;
+	}
+
+	ImageOutput::destroy(out);
 
 	return 0;
 }

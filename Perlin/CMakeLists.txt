@@ -14,6 +14,9 @@ source_group("" FILES ${PERLIN_SOURCES})
 # Adds sources to the Solution Explorer
 add_executable (Perlin ${PERLIN_SOURCES})
 
+# Properties->Linker->Input->Additional Dependencies
+target_link_libraries (Perlin OpenImageIO)
+
 # Creates a folder "executables" and adds target 
 # project (Perlin.vcproj) under it
 set_property(TARGET Perlin PROPERTY FOLDER "executables")
