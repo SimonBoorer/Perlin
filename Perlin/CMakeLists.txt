@@ -15,7 +15,7 @@ source_group("" FILES ${PERLIN_SOURCES})
 add_executable (Perlin ${PERLIN_SOURCES})
 
 # Properties->Linker->Input->Additional Dependencies
-target_link_libraries (Perlin OpenImageIO)
+target_link_libraries (Perlin boost_program_options OpenImageIO)
 
 # Creates a folder "executables" and adds target 
 # project (Perlin.vcproj) under it
