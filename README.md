@@ -6,10 +6,12 @@ A utility for generating 2D Perlin noise
 2. Install [Boost](http://www.boost.org/)
 3. Install [OpenImageIO](http://openimageio.org/)
 4. Clone a copy of the repository:
+
     ```
     git clone https://github.com/SimonBoorer/Perlin.git
     ```
 5. Build with CMake:
+
     ```
     cd Perlin
     mkdir build
